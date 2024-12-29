@@ -5,15 +5,8 @@ import 'addingprod.dart';
 import 'package:provider/provider.dart';
 
 class AppState extends ChangeNotifier {
-  final List<Map<String, dynamic>> roommates = [
-    {'name': 'Indira', 'debt': 0},
-    {'name': 'Srinath', 'debt': 0},
-    {'name': 'Viswa', 'debt': 0},
-    {'name': 'Kavin', 'debt': 0},
-    {'name': 'Nijanth', 'debt': 0},
-  ];
+  final List<Map<String, dynamic>> roommates = [];
   final List<Map<String, dynamic>> products = [];
-
   final List<Map<String, dynamic>> charges = [];
 
   void addCharges(double tax, double offer, double tip, double delivery) {
