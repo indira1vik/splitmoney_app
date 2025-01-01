@@ -131,19 +131,9 @@ class _AddProductState extends State<AddProduct> {
           ],
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FloatingActionButton(
-            onPressed: () => _showAddDialog(context),
-            child: Icon(Icons.add),
-          ),
-          SizedBox(width: 20),
-          FloatingActionButton(
-            onPressed: () => _showAddDialog(context),
-            child: Icon(Icons.save),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddDialog(context),
+        child: Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
