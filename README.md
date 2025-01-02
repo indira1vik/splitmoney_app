@@ -8,7 +8,7 @@ Currently, APK and Windows versions are available for download and testing.
 
 ### Features
 - Split Expenses: Easily divide expenses among groups or individuals.
-- Tax Calculation: Automatically calculate and include taxes in shared bills.
+- Charges Calculation: Automatically calculate and include charges like tax, delivery, tip, discounts in shared bills.
 - Better UI: A modern, user-friendly interface designed for simplicity and ease of use.
 - Cross-Platform Support: Works on Android and Windows.
 
