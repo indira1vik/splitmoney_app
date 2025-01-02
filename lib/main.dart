@@ -2,31 +2,118 @@ import 'package:flutter/material.dart';
 import 'roommates.dart';
 import 'charges.dart';
 import 'addingprod.dart';
+import 'checkout.dart';
 import 'package:provider/provider.dart';
 
 class AppState extends ChangeNotifier {
   final List<Map<String, dynamic>> roommates = [];
   final List<Map<String, dynamic>> products = [];
-  final List<Map<String, dynamic>> charges = [];
+  final Map<String, dynamic> charges = {};
+  bool isButtonPressed = false;
 
+  // Add Charges (Clear and reset charges)
   void addCharges(double tax, double offer, double tip, double delivery) {
-    charges.add({
-      'tax': tax,
-      'offer': offer,
-      'tip': tip,
-      'delivery': delivery,
-    });
+    charges.clear();
+    charges['tax'] = tax;
+    charges['offer'] = offer;
+    charges['tip'] = tip;
+    charges['delivery'] = delivery;
     notifyListeners();
   }
 
-  void addRoommate(String name, double debt) {
+  void changeBtn(bool change) {
+    isButtonPressed = change;
+  }
+
+  // Add Roommate (initialize debt to 0 if not provided)
+  void addRoommate(String name, {double debt = 0.0}) {
     roommates.add({'name': name, 'debt': debt});
     notifyListeners();
   }
 
+  // Add Product (initialize finalPrice and selectedRoommates)
   void addProduct(String name, double price) {
-    products.add({'name': name, 'price': price});
+    products.add({
+      'name': name,
+      'price': price,
+      'selectedRoommates': <String>[],
+      'finalPrice': price, // Initialize finalPrice to price
+    });
     notifyListeners();
+  }
+
+  // Edit Roommate (update name and debt)
+  void editRoommate(
+      Map<String, dynamic> roommate, String updatedName, double updatedDebt) {
+    final index = roommates.indexOf(roommate);
+    if (index != -1) {
+      roommates[index]['name'] = updatedName;
+      roommates[index]['debt'] = updatedDebt;
+      notifyListeners();
+    }
+  }
+
+  // Edit Product (update name, price, and recalculate finalPrice)
+  void editProduct(
+      Map<String, dynamic> product, String updatedName, double updatedPrice) {
+    final index = products.indexOf(product);
+    if (index != -1) {
+      products[index]['name'] = updatedName;
+      products[index]['price'] = updatedPrice;
+
+      // Recalculate final price based on updated price
+      double finalPrice = updatedPrice;
+      products[index]['finalPrice'] = finalPrice;
+
+      notifyListeners();
+    }
+  }
+
+  // Calculate Weighted Prices based on charges (tax, offer, delivery, tip)
+  void calculateWeightedPrices(
+      List<Map<String, dynamic>> products, Map<String, dynamic> charges) {
+    double totalSum =
+        products.fold(0, (sum, product) => sum + product['price']);
+
+    for (var product in products) {
+      double weightage = product['price'] / totalSum;
+      double deliveryShare = weightage * (charges['delivery'] ?? 0);
+      double taxShare = weightage * (charges['tax'] ?? 0);
+      double tipShare = weightage * (charges['tip'] ?? 0);
+      double offerShare = weightage * (charges['offer'] ?? 0);
+
+      product['finalPrice'] =
+          product['price'] - offerShare + deliveryShare + taxShare + tipShare;
+    }
+  }
+
+  // Split Product Prices among roommates
+  void splitProductPrices(List<Map<String, dynamic>> products,
+      List<Map<String, dynamic>> roommates) {
+    for (var product in products) {
+      List<String> selectedRoommates =
+          List<String>.from(product['selectedRoommates'] ?? []);
+
+      int splitAmong = selectedRoommates.length;
+
+      if (splitAmong > 0) {
+        double share = product['finalPrice'] / splitAmong;
+
+        for (var roommate in roommates) {
+          if (selectedRoommates.contains(roommate['name'])) {
+            roommate['debt'] += share;
+          }
+        }
+      }
+    }
+  }
+
+  // Utility function to get a roommate by name (for use in splitting)
+  Map<String, dynamic> getRoommateByName(String name) {
+    return roommates.firstWhere(
+      (roommate) => roommate['name'] == name,
+      orElse: () => {'name': 'Unknown', 'debt': 0.0}, // Default if not found
+    );
   }
 }
 
@@ -65,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -90,7 +177,8 @@ class _MyHomePageState extends State<MyHomePage>
           tabs: [
             Tab(text: 'Products'),
             Tab(text: 'Charges'),
-            Tab(text: 'Results'),
+            Tab(text: 'Checkout'),
+            Tab(text: 'Roommates'),
           ],
         ),
       ),
@@ -99,6 +187,7 @@ class _MyHomePageState extends State<MyHomePage>
         children: [
           AddProduct(),
           ChargesForm(),
+          CheckoutDetails(),
           Roommates(),
         ],
       ),

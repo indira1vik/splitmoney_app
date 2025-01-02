@@ -131,7 +131,6 @@ class _ChargesFormState extends State<ChargesForm> {
               offerAmountController.clear();
               tipAmountController.clear();
               deliveryChargesController.clear();
-              Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
               minimumSize: Size(double.infinity, 54),

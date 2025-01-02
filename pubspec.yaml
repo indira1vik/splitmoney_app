@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.2
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -50,9 +51,15 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "./assets/SplitLogo.png"
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - ./assets/roommates.json
+    - ./assets/SplitLogo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

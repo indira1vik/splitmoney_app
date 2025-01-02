@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'main.dart';
 
@@ -90,9 +91,92 @@ class _AddProductState extends State<AddProduct> {
         });
   }
 
+
+  void _showEditDialog(BuildContext context, Map<String, dynamic> product) {
+    // Pre-fill text controllers with current values
+    TextEditingController editNameController =
+        TextEditingController(text: product['name']);
+    TextEditingController editDebtController =
+        TextEditingController(text: product['price'].toString());
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text("Edit Product")),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: editNameController,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(36.0),
+                    ),
+                    labelText: 'Edit Product Name',
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: editDebtController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(36.0),
+                    ),
+                    labelText: 'Edit Price',
+                    prefixText: '\$ ',
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    String updatedName = editNameController.text.trim();
+                    String updatedDebtText = editDebtController.text.trim();
+
+                    if (updatedName.isNotEmpty && updatedDebtText.isNotEmpty) {
+                      final updatedDebt = double.tryParse(updatedDebtText);
+                      if (updatedDebt != null) {
+                        // Update roommate details
+                        Provider.of<AppState>(context, listen: false)
+                            .editProduct(product, updatedName, updatedDebt);
+                        Navigator.of(context).pop();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                "Invalid price. Please enter a valid number.")));
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please fill in all fields.")));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 54)),
+                  child: Text('Save Changes'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final products = Provider.of<AppState>(context).products;
+    final roommates = Provider.of<AppState>(context).roommates;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -103,26 +187,106 @@ class _AddProductState extends State<AddProduct> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Card(
                   elevation: 4,
-                  child: ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          product['name'] ?? 'Unnamed Product',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                              product['name'] ?? 'Unnamed Product',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '\$${product['price']}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                              ],
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                _showEditDialog(context, product);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                              ),
+                              child: Text('Edit'),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '\$${product['price']}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                          ),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          children: [
+                            // All Checkbox
+                            if (roommates.isNotEmpty && roommates.length > 1)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Checkbox(
+                                    value:
+                                        product['selectedRoommates']?.length ==
+                                            roommates.length,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          product['selectedRoommates'] =
+                                              roommates
+                                                  .map((e) => e['name'])
+                                                  .toList();
+                                        } else {
+                                          product['selectedRoommates'] = [];
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text("All"),
+                                ],
+                              ),
+
+                            ...roommates.map((roommate) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Checkbox(
+                                    value: product['selectedRoommates']
+                                            ?.contains(roommate['name']) ??
+                                        false,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          product['selectedRoommates'] ??= [];
+                                          product['selectedRoommates']
+                                              .add(roommate['name']);
+                                        } else {
+                                          product['selectedRoommates']
+                                              ?.remove(roommate['name']);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text(roommate['name']),
+                                ],
+                              );
+                            }).toList(),
+                          ],
                         ),
-                      ],
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      )
+                    ],
                   ),
                 ),
               );
