@@ -21,14 +21,10 @@ Currently, APK and Windows versions are available for download and testing.
 6. Click to view the split money.
 
 ### Screenshots
-<img src="./assets/one.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/two.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/three.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/four.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/five.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/six.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/seven.png" alt="img1" style="width:40%; height:auto;">
-<img src="./assets/eight.png" alt="img1" style="width:40%; height:auto;">
+<img src="./assets/one.png" alt="img1" style="width:40%; height:auto;"> <img src="./assets/two.png" alt="img1" style="width:40%; height:auto;">
+<img src="./assets/three.png" alt="img1" style="width:40%; height:auto;"> <img src="./assets/four.png" alt="img1" style="width:40%; height:auto;">
+<img src="./assets/five.png" alt="img1" style="width:40%; height:auto;"> <img src="./assets/six.png" alt="img1" style="width:40%; height:auto;">
+<img src="./assets/seven.png" alt="img1" style="width:40%; height:auto;"> <img src="./assets/eight.png" alt="img1" style="width:40%; height:auto;">
 
 ### Contributing to SplitMoney
 Any kind of positive contribution is welcome! Please help us grow by contributing to the project.
